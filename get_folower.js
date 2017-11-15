@@ -72,7 +72,7 @@ function listget(num, what) {
 				listgettemp = JSON.stringify(listgettemp, undefined, 4);
 				let now = new Date();
 				let nowdate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}--${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`
-				fs.writeFile(what + "/" + nowdate + ".json", listgettemp);
+				fs.writeFile("./"+what + "/" + nowdate + ".json", listgettemp);
 
 				/*
 
