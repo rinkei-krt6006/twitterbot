@@ -63,9 +63,29 @@ function listget(num, what) {
 			if (data.next_cursor_str != "0") {
 				listget(data.next_cursor_str, what)
 			} else {
-				console.log(what + " " + listgettemp.users.length)
+				console.log(what + " " + listgettemp.users.length);
 				listgettemp = JSON.stringify(listgettemp, undefined, 4);
-				fs.writeFile(what + ".json", listgettemp)
+				let now = new Date();
+				let nowdate = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}--${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`
+				fs.writeFile( what  + "/" + nowdate + ".json", listgettemp);
+
+
+				let oldList = fs.readFileSync(`${what}/${what}.json`)
+				oldList = JSON.parse(oldList);
+				let aryoldList = [];
+
+				let newList = listgettemp;
+				newList = JSON.parse(newList);
+				let arynewList = [];
+
+				for(let i=0;i<oldList.length;i++){
+					aryoldList.push([id,i,oldList[i].name,oldlist[i].screen_name])
+				}
+				for(let i=0;i<newList.length;i++){
+					arynewList.push([id,i,newList[i].name,newlist[i].screen_name])
+				}
+				console.log(arynewList)
+
 				if (what === "followers") {
 					listgettemp = undefined
 					listget(undefined, "friends")
