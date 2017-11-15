@@ -1,1 +1,6 @@
 key.txt
+follower/*
+!.gitkeep
+friends/*
+!.gitkeep
+
