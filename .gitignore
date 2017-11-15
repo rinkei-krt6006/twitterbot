@@ -1,5 +1,5 @@
 key.txt
-follower/*
+followers/*
 !.gitkeep
 friends/*
 !.gitkeep

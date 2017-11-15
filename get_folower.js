@@ -1,4 +1,4 @@
-#!/home/ubuntu/.nodebrew/current/bin/node
+
 const fs = require("fs");
 const util = require("util");
 const twitter = require("twitter");
@@ -45,13 +45,18 @@ function listget(num, what) {
 	key.get(what + '/list',
 		{ count: 200, cursor: num },
 		function (error, data, log) {
-			console.log(error)
-			/*
-			if (error.message === "Rate limit exceeded"){
-				console.log("API制限")
+
+			if (error === null) {
+			} else {
+				console.log("取得エラー")
+				if (error[0].message === 'Rate limit exceeded') {
+					console.log("API制限")
+				} else {
+					console.log(error)
+				}
 				process.exit()
 			}
-			*/
+
 			if (listgettemp === undefined) {
 				listgettemp = data
 			} else {
@@ -66,9 +71,10 @@ function listget(num, what) {
 				console.log(what + " " + listgettemp.users.length);
 				listgettemp = JSON.stringify(listgettemp, undefined, 4);
 				let now = new Date();
-				let nowdate = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}--${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`
-				fs.writeFile( what  + "/" + nowdate + ".json", listgettemp);
+				let nowdate = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}--${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`
+				fs.writeFile(what + "/" + nowdate + ".json", listgettemp);
 
+				/*
 
 				let oldList = fs.readFileSync(`${what}/${what}.json`)
 				oldList = JSON.parse(oldList);
@@ -86,10 +92,15 @@ function listget(num, what) {
 				}
 				console.log(arynewList)
 
+				*/
+
+
 				if (what === "followers") {
 					listgettemp = undefined
 					listget(undefined, "friends")
 				} else {
+					console.log("end");
+					process.exit()
 
 				}
 			}
