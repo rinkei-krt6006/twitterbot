@@ -80,6 +80,7 @@ key.stream('user', function (stream) {
 					{ status: "@" + scname[i] +" "+ text, in_reply_to_status_id: data.delete.status.id_str },
 					function (error, tweet, response) {
 					})
+					console.log(new Date)
 				break;
 				}
 			}
