@@ -64,8 +64,16 @@ key.stream('user', function (stream) {
 		temp += white + data.text + "\r\n";
 		temp += green + "via " + tmp + "\r\n";
 		temp += data.user.created_at + reset + "\r\n";
-
-		console.log(temp);
+		console.log(twinum)
+		if(10000<twiid.length){
+			let twinum = -1;
+			let twiid = [];
+			let twitxt = [];
+			let twiname = [];
+			let scname = [];
+			let now = new Date
+			console.log("reset"+now.toLocaleDateString+now.toLocaleTimeString)
+		}
 	});
 
 
