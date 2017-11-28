@@ -95,6 +95,12 @@ key.stream('user', function (stream) {
 		}
 	})
 
+	stream.on('follow', function(data) {
+		console.log("follow")
+    key.post('friendships/create', {user_id:data.source.id_str});
+  });
+});
+
 	/*
 	key.get("users/show.json",
 		{ user_id: data.delete.status.user_id_str },
@@ -111,7 +117,6 @@ key.stream('user', function (stream) {
 	)
 */
 
-});
 
 
 /*
