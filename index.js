@@ -65,7 +65,7 @@ key.stream('user', function (stream) {
 		temp += green + "via " + tmp + "\r\n";
 		temp += data.user.created_at + reset + "\r\n";
 		console.log(twinum)
-		if(10000<twiid.length){
+		if(1000<twiid.length){
 			let twinum = -1;
 			let twiid = [];
 			let twitxt = [];
@@ -88,6 +88,7 @@ key.stream('user', function (stream) {
 					{ status: "@" + scname[i] +" "+ text, in_reply_to_status_id: data.delete.status.id_str },
 					function (error, tweet, response) {
 					})
+					console.log("ツイ消し警察")
 					console.log(new Date)
 					break;
 				}
