@@ -89,14 +89,15 @@ key.stream('user', function (stream) {
 					function (error, tweet, response) {
 					})
 					console.log(new Date)
-				break;
+					break;
 				}
 			}
 		}
 	})
 
 	stream.on('follow', function(data) {
-		console.log("follow")
+		console.log("follow");
+		console.log(new Date)		
     key.post('friendships/create', {user_id:data.source.id_str});
   });
 });
