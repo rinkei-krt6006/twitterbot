@@ -66,12 +66,12 @@ key.stream('user', function (stream) {
 		temp += data.user.created_at + reset + "\r\n";
 		console.log(twinum)
 		if(1000<twiid.length){
-			let twinum = -1;
-			let twiid = [];
-			let twitxt = [];
-			let twiname = [];
-			let scname = [];
-			let now = new Date
+			twinum = -1;
+			twiid.length = 0;
+			twitxt.length = 0;
+			twiname.length = 0;
+			scname.length = 0;
+			now = new Date
 			console.log("reset"+now.toLocaleDateString+now.toLocaleTimeString)
 		}
 	});
