@@ -1,4 +1,5 @@
 key.txt
+.env
 followers/*
 !.gitkeep
 friends/*
