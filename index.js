@@ -64,7 +64,7 @@ key.stream('user', function (stream) {
 		temp += white + data.text + "\r\n";
 		temp += green + "via " + tmp + "\r\n";
 		temp += data.user.created_at + reset + "\r\n";
-		console.log(twinum)
+		console.log(twinum+ new Date)
 		if(1000<twiid.length){
 			twinum = -1;
 			twiid.length = 0;
