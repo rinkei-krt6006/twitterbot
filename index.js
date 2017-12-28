@@ -1,15 +1,7 @@
 #!/home/ubuntu/.nodebrew/current/bin/node
 const fs = require("fs");
-const util = require("util");
 const twitter = require("twitter");
-let path = require("path");
-const readline = require("readline").createInterface({
-	input: process.stdin,
-	output: process.stdout
-});
-
-let pathdata = process.argv[1];
-pathdata = path.dirname(pathdata);
+const Sequelize = require('sequelize').Sequelize;
 
 require('dotenv').config();
 if (process.env.consumer_key === undefined) {
@@ -24,100 +16,96 @@ if (process.env.consumer_key === undefined) {
 	});
 };
 
-//文字色
-const black = '\u001b[30m';
-const red = '\u001b[31m';
-const green = '\u001b[32m';
-const yellow = '\u001b[33m';
-const blue = '\u001b[34m';
-const magenta = '\u001b[35m';
-const cyan = '\u001b[36m';
-const white = '\u001b[37m';
-const reset = '\u001b[0m';
-//記憶域
-let twinum = -1;
-let twiid = [];
-let twitxt = [];
-let twiname = [];
-let scname = [];
-let replynum = "";
-let mode = undefined;
+const dbObjBySequelize = new Sequelize(
+	process.env.database,
+	process.env.user,
+	process.env.password,
+	{
+		dialect: 'mysql',
+		port: process.env.localPort,
+		host: process.env.localHost
+	}
+);
+const DBtimeline = dbObjBySequelize.define(
+	'timeline',
+	{
+		id: {
+			type: Sequelize.INTEGER,
+			primaryKey: true
+		},
+		id_str: {
+			type: Sequelize.STRING
+		},
+		text: {
+			type: Sequelize.STRING
+		},
+		user_name: {
+			type: Sequelize.STRING
+		},
+		user_screen_name: {
+			type: Sequelize.STRING
+		}
+	},
+	{
+		freezeTableName: true,
+		timestamps: false
+	}
+);
 
-console.log("welcome")
+key.get("account/verify_credentials", function (error, data) {
+	mydata = JSON.stringify(data)
+	mydata = JSON.parse(mydata)
+	//console.log(mydata)
+
+	console.log("認証アカウント")
+	console.log("@" + mydata.screen_name)
+	console.log(mydata.name)
+	console.log("\n")
+
+})
 
 key.stream('user', function (stream) {
 
 	stream.on("data", function (data) {
+		console.log("\n"+new Date)
+		let newDBtimeline = new DBtimeline({
+			id_str: data.id_str,
+			text: data.text,
+			user_name: data.user.name,
+			user_screen_name: data.user.screen_name
+		})
+		newDBtimeline.save()
 
-		let tmp = data.source;
-		tmp = tmp.split('">');
-		tmp = tmp[1].split('</a>');
-
-		twinum = twinum + 1;
-		twiid.push(data.id_str);
-		twitxt.push(data.text);
-		twiname.push(data.user.name);
-		scname.push(data.user.screen_name);
-
-		let temp = "No." + twinum + "\r\n";
-		temp += cyan + data.user.name + " @" + data.user.screen_name + "\r\n";
-		temp += white + data.text + "\r\n";
-		temp += green + "via " + tmp + "\r\n";
-		temp += data.user.created_at + reset + "\r\n";
-		console.log(twinum+ new Date)
-		if(1000<twiid.length){
-			twinum = -1;
-			twiid.length = 0;
-			twitxt.length = 0;
-			twiname.length = 0;
-			scname.length = 0;
-			now = new Date
-			console.log("reset"+now.toLocaleDateString+now.toLocaleTimeString)
-		}
 	});
 
 
 	stream.on("delete", function (data) {
 		let text = "ピピーっ！👮👮ツイッター警察です🚨🚨🙅🙅あなたはツイッター迷惑行為防止条例第334条🌟「ツイ消しをしてはいけない❗️😡👊🏻」に違反しているゾ😤😤😤💢💢💢！！！！！ぃますぐ😩😩😩ツイートをし直しなさい💢💢💢！！！😇";
-		for (let i = twiid.length; i > 0; i--) {
-			if (twiid[i] === data.delete.status.id_str) {
-				if(twitxt[i].match(/RT @/)){
-					//rt取り消し
-				}else{
+		DBtimeline.findAll({
+			where: {
+				id_str: data.delete.status.id_str
+			}
+		}).then(deleteTweet => {
+			if (deleteTweet[0].text.match(/RT @/)) {
+				//rt取り消し
+			} else {
 				key.post('statuses/update',
-					{ status: "@" + scname[i] +" "+ text, in_reply_to_status_id: data.delete.status.id_str },
+					{ status: "@" + deleteTweet[0].user_screen_name + " " + text, in_reply_to_status_id: data.delete.status.id_str },
 					function (error, tweet, response) {
 					})
-					console.log("ツイ消し警察")
-					console.log(new Date)
-					break;
-				}
+				console.log("ツイ消し警察");
+				console.log(new Date);
+				return;
 			}
-		}
+		})
 	})
 
-	stream.on('follow', function(data) {
+	stream.on('follow', function (data) {
 		console.log("follow");
-		console.log(new Date)		
-    key.post('friendships/create', {user_id:data.source.id_str});
-  });
+		console.log(new Date)
+		key.post('friendships/create', { user_id: data.source.id_str });
+	});
 });
-
-	/*
-	key.get("users/show.json",
-		{ user_id: data.delete.status.user_id_str },
-		function (err, userdata) {
-			key.post('statuses/update',
-				{ status: "@" + userdata.screen_name + text, in_reply_to_status_id: data.delete.status.id_str },
-				function (error, tweet, response) {
-					if (!error) {
-					} else {
-						console.log(error)
-					}
-				})
-		}
-	)
-*/
 
 
 
