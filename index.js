@@ -2,6 +2,7 @@
 const fs = require("fs");
 const twitter = require("twitter");
 const Sequelize = require('sequelize').Sequelize;
+const cron = require('cron').CronJob;
 
 require('dotenv').config();
 if (process.env.consumer_key === undefined) {
@@ -39,12 +40,31 @@ const DBtimeline = dbObjBySequelize.define(
 		text: {
 			type: Sequelize.STRING
 		},
+		user_id: {
+			type: Sequelize.STRING
+		},
 		user_name: {
 			type: Sequelize.STRING
 		},
 		user_screen_name: {
 			type: Sequelize.STRING
 		}
+	},
+	{
+		freezeTableName: true,
+		timestamps: false
+	}
+);
+const DBkichitsui = dbObjBySequelize.define(
+	'kichitsui',
+	{
+		id: {
+			type: Sequelize.INTEGER,
+			primaryKey: true
+		},
+		text: {
+			type: Sequelize.STRING
+		},
 	},
 	{
 		freezeTableName: true,
@@ -63,14 +83,19 @@ key.get("account/verify_credentials", function (error, data) {
 	console.log("\n")
 
 })
-
 key.stream('user', function (stream) {
 
+	stream.on('direct_message', function (dmData) {
+		console.log("hogehoge")
+		console.log(dmData)
+	})
+
 	stream.on("data", function (data) {
-		console.log("\n"+new Date)
+		console.log("\n" + new Date)
 		let newDBtimeline = new DBtimeline({
 			id_str: data.id_str,
 			text: data.text,
+			user_id: data.user.id_str,
 			user_name: data.user.name,
 			user_screen_name: data.user.screen_name
 		})
@@ -93,6 +118,11 @@ key.stream('user', function (stream) {
 					{ status: "@" + deleteTweet[0].user_screen_name + " " + text, in_reply_to_status_id: data.delete.status.id_str },
 					function (error, tweet, response) {
 					})
+				key.post('direct_messages/new',
+					{ user_id: deleteTweet[0].user_id, text: deleteTweet[0].text + "\nが削除されたことを検知しました。" },
+					function (err, data, resp) {
+
+					})
 				console.log("ツイ消し警察");
 				console.log(new Date);
 				return;
@@ -107,6 +137,26 @@ key.stream('user', function (stream) {
 	});
 });
 
+var job = new cron({
+	cronTime: '0 0,30 * * * *',
+	//cronTime: '*/2 * * * * *',
+	onTick: function () {
+		let postData
+		DBkichitsui.findAll({
+		}).then(DBdata => {
+			postData = DBdata[Math.floor(Math.random() * DBdata.length)].text
+
+			key.post('statuses/update',
+				{ status: postData },
+				function (error, tweet, response) {
+				})
+		})
+
+	},
+	start: false, //newした後即時実行するかどうか
+	timeZone: 'Asia/Tokyo'
+});
+job.start();
 
 
 /*
