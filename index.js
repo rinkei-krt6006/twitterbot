@@ -84,23 +84,40 @@ key.get("account/verify_credentials", function (error, data) {
 
 })
 key.stream('user', function (stream) {
-
-	stream.on('direct_message', function (dmData) {
-		console.log("hogehoge")
-		console.log(dmData)
+	stream.on("direct_message", function (data) {
+		console.log(data)
 	})
-
 	stream.on("data", function (data) {
-		console.log("\n" + new Date)
-		let newDBtimeline = new DBtimeline({
-			id_str: data.id_str,
-			text: data.text,
-			user_id: data.user.id_str,
-			user_name: data.user.name,
-			user_screen_name: data.user.screen_name
-		})
-		newDBtimeline.save()
-
+		if (!!data.direct_message) {
+			//DM
+			if (data.direct_message.sender.id_str === mydata.id_str) {
+				//自分が送信したDM
+			} else {
+				if(data.direct_message.sender.id_str==="732074970419863553"){
+					//KRT6006からのDM
+					let newDBkichitsui = new DBkichitsui({
+						text: data.direct_message.text,
+					})
+					newDBkichitsui.save()
+				}else{
+					//他人からのDM
+				}
+			}
+		} else {
+			//ツイート
+			let newDBtimeline = new DBtimeline({
+				id_str: data.id_str,
+				text: data.text,
+				user_id: data.user.id_str,
+				user_name: data.user.name,
+				user_screen_name: data.user.screen_name
+			})
+			newDBtimeline.save()
+		}
+		stream.on('error', function (error) {
+			console.log(error);
+			resflg = 1;
+		});
 	});
 
 
