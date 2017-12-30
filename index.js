@@ -48,7 +48,13 @@ const DBtimeline = dbObjBySequelize.define(
 		},
 		user_screen_name: {
 			type: Sequelize.STRING
-		}
+		},
+		time: {
+			type: Sequelize.STRING
+		},
+		delete: {
+			type: Sequelize.STRING
+		},
 	},
 	{
 		freezeTableName: true,
@@ -93,24 +99,28 @@ key.stream('user', function (stream) {
 			if (data.direct_message.sender.id_str === mydata.id_str) {
 				//自分が送信したDM
 			} else {
-				if(data.direct_message.sender.id_str==="732074970419863553"){
+				if (data.direct_message.sender.id_str === "732074970419863553") {
 					//KRT6006からのDM
 					let newDBkichitsui = new DBkichitsui({
 						text: data.direct_message.text,
 					})
 					newDBkichitsui.save()
-				}else{
+				} else {
 					//他人からのDM
 				}
 			}
 		} else {
 			//ツイート
+			let time = new Date(data.created_at)
+			let localTime = time.toLocaleString()
+			console.log(localTime)
 			let newDBtimeline = new DBtimeline({
 				id_str: data.id_str,
 				text: data.text,
 				user_id: data.user.id_str,
 				user_name: data.user.name,
-				user_screen_name: data.user.screen_name
+				user_screen_name: data.user.screen_name,
+				time: localTime,
 			})
 			newDBtimeline.save()
 		}
@@ -136,12 +146,18 @@ key.stream('user', function (stream) {
 					function (error, tweet, response) {
 					})
 				key.post('direct_messages/new',
-					{ user_id: deleteTweet[0].user_id, text: deleteTweet[0].text + "\nが削除されたことを検知しました。" },
+					{ user_id: deleteTweet[0].user_id, text: deleteTweet[0].text + "\n" + deleteTweet[0].time + "\nが削除されたことを検知しました。" },
 					function (err, data, resp) {
 
 					})
 				console.log("ツイ消し警察");
 				console.log(new Date);
+				DBtimeline.update({
+					delete: "true"
+				},
+					{ where: { id_str: data.delete.status.id_str +""} }
+
+				)
 				return;
 			}
 		})
