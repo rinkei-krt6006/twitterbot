@@ -155,7 +155,7 @@ key.stream('user', function (stream) {
 				DBtimeline.update({
 					delete: "true"
 				},
-					{ where: { id_str: data.delete.status.id_str +""} }
+					{ where: { id_str: data.delete.status.id_str + "" } }
 
 				)
 				return;
@@ -170,8 +170,8 @@ key.stream('user', function (stream) {
 	});
 });
 
-var job = new cron({
-	cronTime: '0 0,30 * * * *',
+var cronKichitsui = new cron({
+	cronTime: '0 15,45 * * * *',
 	//cronTime: '*/2 * * * * *',
 	onTick: function () {
 		let postData
@@ -189,9 +189,68 @@ var job = new cron({
 	start: false, //newした後即時実行するかどうか
 	timeZone: 'Asia/Tokyo'
 });
-job.start();
+cronKichitsui.start();
+
+let cronTime = new cron({
+	cronTime: '0 0 * * * *',
+	onTick: function () {
+		let time = new Date
+		time = time.toLocaleString()
+		let postData = `【時報】\n${time}\n\n管理者:https://twitter.com/krt6006`
+		key.post('statuses/update',
+			{ status: postData },
+			function (error, tweet, response) {
+			})
 
 
+	},
+	start: false, 
+	timeZone: 'Asia/Tokyo'
+});
+cronTime.start();
+
+
+let cronAM3Ibaraki = new cron({
+	cronTime: '0 0 3 * * *',
+	onTick: function () {
+		let postData = `午̷̖̺͈̆͛͝前̧̢̖̫̊3̘̦時̗͡の̶̛̘̙̤̙̌̉͢い̷゙̊̈̓̓̅ば̬̬̩͈̊͡ら゙̜̩̹ぎ̫̺̓ͣ̕͡げ̧̛̩̞̽ん゙̨̼̗̤̂̄`
+		key.post('statuses/update',
+			{ status: postData },
+			function (error, tweet, response) {
+			})
+	},
+	start: false, 
+	timeZone: 'Asia/Tokyo'
+});
+cronAM3Ibaraki.start();
+
+let cronPM3Ibaraki = new cron({
+	cronTime: '0 0 15 * * *',
+	onTick: function () {
+		let postData = `午̷̖̺͈̆͛͝後̧̢̖̫̊3̘̦時̗͡の̶̛̘̙̤̙̌̉͢い̷゙̊̈̓̓̅ば̬̬̩͈̊͡ら゙̜̩̹ぎ̫̺̓ͣ̕͡げ̧̛̩̞̽ん゙̨̼̗̤̂̄`
+		key.post('statuses/update',
+			{ status: postData },
+			function (error, tweet, response) {
+			})
+	},
+	start: false, 
+	timeZone: 'Asia/Tokyo'
+});
+cronPM3Ibaraki.start();
+
+let cronPM3Ibaraki = new cron({
+	cronTime: '0 34 3,15 * * *',
+	onTick: function () {
+		let postData = `334`
+		key.post('statuses/update',
+			{ status: postData },
+			function (error, tweet, response) {
+			})
+	},
+	start: false, 
+	timeZone: 'Asia/Tokyo'
+});
+cronPM3Ibaraki.start();
 /*
 licenses
 
