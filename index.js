@@ -238,7 +238,7 @@ let cronPM3Ibaraki = new cron({
 });
 cronPM3Ibaraki.start();
 
-let cronPM3Ibaraki = new cron({
+let cron334 = new cron({
 	cronTime: '0 34 3,15 * * *',
 	onTick: function () {
 		let postData = `334`
@@ -250,7 +250,7 @@ let cronPM3Ibaraki = new cron({
 	start: false, 
 	timeZone: 'Asia/Tokyo'
 });
-cronPM3Ibaraki.start();
+cron334.start();
 /*
 licenses
 
